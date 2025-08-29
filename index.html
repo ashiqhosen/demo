@@ -168,6 +168,107 @@
     </style>
 </head>
 <body>
+<!-- Password Modal -->
+<div id="password-modal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgb(101 111 189);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#fff;padding:32px 24px;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.2);max-width:350px;margin:auto;text-align:center;">
+    <h3 style="margin-bottom:18px;color:#07305b;">Enter Password</h3>
+    <div style="display:flex;justify-content:center;align-items:center;">
+      <input type="password" id="password-input" style="width:90%;padding:10px;border-radius:8px;border:1px solid #ccc;margin-bottom:16px;" placeholder="Password">
+      <span id="toggle-password" style="cursor:pointer;font-size:18px;color:#6ca4ff;margin-left:-28px;margin-top:-15px;">👁️</span>
+    </div>
+    <button id="password-submit" style="padding:8px 18px;border-radius:8px;background:#6ca4ff;color:#fff;border:none;font-weight:700;cursor:pointer;">Access</button>
+    <div id="password-error" style="color:#ff4d4d;margin-top:12px;display:none;">Incorrect password. Try again.</div>
+  </div>
+</div>
+
+<script type="module">
+  // --- Password Protection ---
+  const ACCESS_KEY = 'portfolio_access';
+  const PASSWORD = 'ashiq2025'; // Change this password
+
+  function showPasswordModal() {
+    document.getElementById('password-modal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    document.getElementById('password-input').focus();
+  }
+  function hidePasswordModal() {
+    document.getElementById('password-modal').style.display = 'none';
+    document.body.style.overflow = '';
+  }
+  function checkAccess() {
+    return sessionStorage.getItem(ACCESS_KEY) === 'true';
+  }
+  function grantAccess() {
+    sessionStorage.setItem(ACCESS_KEY, 'true');
+    hidePasswordModal();
+  }
+
+  // On page load, check access
+  if (!checkAccess()) {
+    showPasswordModal();
+  }
+
+  // Password modal logic
+  document.getElementById('password-submit').onclick = function() {
+    const val = document.getElementById('password-input').value;
+    if (val === PASSWORD) {
+      grantAccess();
+    } else {
+      document.getElementById('password-error').style.display = 'block';
+      document.getElementById('password-input').value = '';
+      document.getElementById('password-input').focus();
+    }
+  };
+  document.getElementById('password-input').addEventListener('keydown', function(e){
+    if(e.key === 'Enter') document.getElementById('password-submit').click();
+  });
+
+  // Toggle password visibility
+  const passwordInput = document.getElementById('password-input');
+  const togglePassword = document.getElementById('toggle-password');
+  togglePassword.onclick = function() {
+    if (passwordInput.type === 'password') {
+      passwordInput.type = 'text';
+      togglePassword.textContent = '🙈';
+    } else {
+      passwordInput.type = 'password';
+      togglePassword.textContent = '👁️';
+    }
+  };
+
+
+  
+  // Disable right-click
+  document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+  });
+
+  // Disable DevTools shortcuts
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'F12') e.preventDefault();
+    if ((e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)) ||
+        (e.ctrlKey && e.key === 'U') ||
+        (e.metaKey && e.altKey && e.key === 'I')) {
+      e.preventDefault();
+    }
+  });
+
+  
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
