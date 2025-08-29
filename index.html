@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevsOffice Portfolio Finder</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta2/css/bootstrap-select.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+        }
+        button{
+            margin: 5px;
+        }
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            border: none;
+        }
+        .card-header {
+            background: linear-gradient(45deg, #4e73df, #224abe);
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+            padding: 15px 20px;
+        }
+        .filter-section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        .table-responsive {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        table {
+            font-size: 14px;
+        }
+        thead th {
+            position: sticky;
+            top: 0;
+            background-color: #4e73df;
+            color: white;
+            z-index: 100;
+        }
+        .btn-primary {
+            background: linear-gradient(45deg, #4e73df, #224abe);
+            border: none;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(45deg, #224abe, #4e73df);
+        }
+        .btn-success {
+            background: linear-gradient(45deg, #1cc88a, #13855c);
+            border: none;
+        }
+        .btn-success:hover {
+            background: linear-gradient(45deg, #13855c, #1cc88a);
+        }
+        .btn-warning {
+            background: linear-gradient(45deg, #f6c23e, #dda20a);
+            border: none;
+        }
+        .btn-warning:hover {
+            background: linear-gradient(45deg, #dda20a, #f6c23e);
+        }
+        .copy-btn {
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .copy-btn:hover {
+            transform: scale(1.1);
+        }
+        .filter-pill {
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        .thumbnail-cell {
+            width: 80px;
+        }
+        .thumbnail {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        .highlight {
+            background-color: #e9f7fe;
+            transition: background-color 0.5s;
+        }
+        .filter-group {
+            margin-bottom: 15px;
+        }
+        .filter-label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #4e73df;
+        }
+        .bootstrap-select .btn {
+            padding: 8px 15px;
+            background-color: white;
+        }
+        .total-count {
+            font-weight: 600;
+            color: #4e73df;
+            background-color: #e9f7fe;
+            padding: 5px 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .loading-spinner {
+            display: inline-block;
+            width: 2rem;
+            height: 2rem;
+            vertical-align: text-bottom;
+            border: 0.25em solid currentColor;
+            border-right-color: transparent;
+            border-radius: 50%;
+            animation: spinner-border .75s linear infinite;
+            color: #4e73df;
+            margin-right: 10px;
+        }
+        .limit-control {
+            max-width: 100px;
+        }
+        .settings-panel {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        .settings-label {
+            font-weight: 600;
+            color: #4e73df;
+            margin-bottom: 5px;
+        }
+        .selection-info {
+            background-color: #e9f7fe;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-weight: 500;
+        }
+        .checkbox-cell {
+            width: 40px;
+        }
+        .table-hover tbody tr:hover {
+            background-color: rgba(78, 115, 223, 0.05);
+        }
+        @keyframes spinner-border {
+            to { transform: rotate(360deg); }
+        }
+        .tooltip-inner {
+            max-width: 350px;
+            text-align: left;
+        }
+        .select-all-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h3 class="card-title mb-0"><i class="fas fa-filter me-2"></i>DevsOffice Portfolio Finder</h3>
+                        <span id="totalCount" class="total-count">Loading data...</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="filter-section">
+                                    <div class="row mb-3">
+                                        <div class="col-md-3 filter-group">
+                                            <div class="filter-label">Platform</div>
+                                            <select class="selectpicker form-control" id="platformFilter" multiple data-actions-box="true" data-selected-text-format="count > 2" data-count-selected-text="{0} platforms selected" title="All Platforms">
+                                                <!-- Options will be populated dynamically -->
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3 filter-group">
+                                            <div class="filter-label">Industry</div>
+                                            <select class="selectpicker form-control" id="industryFilter" multiple data-actions-box="true" data-selected-text-format="count > 2" data-count-selected-text="{0} industries selected" title="All Industries">
+                                                <!-- Options will be populated dynamically -->
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3 filter-group">
+                                            <div class="filter-label">Plugin</div>
+                                            <select class="selectpicker form-control" id="pluginFilter" multiple data-actions-box="true" data-selected-text-format="count > 2" data-count-selected-text="{0} plugins selected" title="All Plugins">
+                                                <!-- Options will be populated dynamically -->
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3 filter-group">
+                                            <div class="filter-label">Search</div>
+                                            <input type="text" class="form-control" id="searchFilter" placeholder="Search across all fields...">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <button id="applyFilters" class="btn btn-primary me-2"><i class="fas fa-check-circle me-1"></i>Apply Filters</button>
+                                            <button id="refreshItems" class="btn btn-warning me-2"><i class="fas fa-random me-1"></i>Refresh & Randomize</button>
+                                            <button id="resetFilters" class="btn btn-secondary me-2"><i class="fas fa-redo me-1"></i>Reset Filters</button>
+                                            <button id="copyLinks" class="btn btn-success" data-bs-toggle="tooltip" data-bs-placement="top" title="Copied links will be numbered like: 1. https://example.com"><i class="fas fa-copy me-1"></i>Copy Selected Links</button>
+                                        </div>
+                                        <div class="col-md-4 text-end">
+                                            <div class="settings-panel">
+                                                <div class="settings-label">Display Limit</div>
+                                                <div class="d-flex align-items-center justify-content-end">
+                                                    <span class="me-2">Show</span>
+                                                    <input type="number" class="form-control limit-control me-2" id="itemLimit" value="10" min="1">
+                                                    <span>items</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-12">
+                                            <div id="activeFilters" class="d-flex flex-wrap"></div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-12">
+                                            <div id="selectionInfo" class="selection-info">
+                                                No items selected. Use checkboxes to select items for copying.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="select-all-container">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="selectAll">
+                                        <label class="form-check-label" for="selectAll">
+                                            Select all displayed items
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-hover table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th class="checkbox-cell">Select</th>
+                                                <th>#</th>
+                                                <th>Title</th>
+                                                <th>Name</th>
+                                                <th>URL</th>
+                                                <th>Plugins</th>
+                                                <th>Date</th>
+                                                <th>Platform</th>
+                                                <th>Industry</th>
+                                                <th>Reviews</th>
+                                                <th class="thumbnail-cell">Thumbnail</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="dataTable">
+                                            <tr>
+                                                <td colspan="11" class="text-center">
+                                                    <div class="py-4">
+                                                        <div class="loading-spinner"></div>
+                                                        Loading data...
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta2/js/bootstrap-select.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let csvData = [];
+            let filteredData = [];
+            let displayedData = [];
+            const selectedItems = new Set();
+            const uniqueValues = {
+                platforms: new Set(),
+                industries: new Set(),
+                plugins: new Set()
+            };
+
+            // Initialize tooltips
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+
+            // Fetch CSV data from the provided URL using Papa Parse
+            async function fetchData() {
+                try {
+                    Papa.parse('https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7i9scHGsSQyKVaUugdJvGHmrUgawQ2JytQVYyi8YqG483xLZKwA8gyKbEhqVJjJp80AKdPnW1XzBv/pub?gid=681299010&single=true&output=csv', {
+                        download: true,
+                        header: true,
+                        skipEmptyLines: true,
+                        complete: function(results) {
+                            if (results.data && results.data.length > 0) {
+                                csvData = results.data;
+                                processData(csvData);
+                            } else {
+                                displayError('No data found in the CSV');
+                            }
+                        },
+                        error: function(error) {
+                            console.error('Error parsing CSV:', error);
+                            displayError('Error loading data. Please try again later.');
+                            
+                            // Load sample data as fallback
+                            loadSampleData();
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error fetching CSV data:', error);
+                    displayError('Error loading data. Please try again later.');
+                    
+                    // Load sample data as fallback
+                    loadSampleData();
+                }
+            }
+
+            // Process the CSV data
+            function processData(data) {
+                // Collect unique values for filters
+                data.forEach(row => {
+                    if (row.Platform) uniqueValues.platforms.add(row.Platform);
+                    if (row.industry) uniqueValues.industries.add(row.industry);
+                    if (row.plugins) {
+                        const pluginList = row.plugins.split(', ');
+                        pluginList.forEach(plugin => uniqueValues.plugins.add(plugin));
+                    }
+                });
+                
+                populateFilterOptions();
+                applyFilter();
+                updateTotalCount();
+            }
+
+            // Display error message
+            function displayError(message) {
+                document.getElementById('dataTable').innerHTML = 
+                    `<tr><td colspan="11" class="text-center text-danger py-4">${message}</td></tr>`;
+                document.getElementById('totalCount').textContent = '0 items';
+            }
+
+            // Load sample data if CSV cannot be loaded
+            function loadSampleData() {
+                const sampleData = [
+                    {
+                        title: 'Devs Office',
+                        name: 'Great Project',
+                        url: 'https://devsoffice.com',
+                        plugins: 'Tutor LMS, Learndash',
+                        date: '20/08/2025',
+                        content: 'Hello there, I would like to show you something special',
+                        Platform: 'Fiverr',
+                        industry: 'Elearning',
+                        reviews: '',
+                        thumbnail: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8cHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=600&q=61'
+                    },
+                    {
+                        title: 'Dev it care',
+                        name: 'Great Project',
+                        url: 'https://demo.com',
+                        plugins: 'Tutor LMS, Woocommerce',
+                        date: '20/08/2025',
+                        content: 'Hello there, I would like to show you something special',
+                        Platform: 'Fiverr',
+                        industry: 'Business',
+                        reviews: 'I am really happy working with DevsOffice',
+                        thumbnail: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8cHJvZuctHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=600&q=61'
+                    },
+                    {
+                        title: 'All in one',
+                        name: 'Great Project',
+                        url: 'https://example.com',
+                        plugins: 'Learndash',
+                        date: '20/08/2025',
+                        content: 'Hello there, I would like to show you something special',
+                        Platform: 'Fiverr',
+                        industry: 'Membership',
+                        reviews: 'I am really happy working with DevsOffice',
+                        thumbnail: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8cHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=600&q=61'
+                    },
+                    {
+                        title: 'Wechat',
+                        name: 'Great Project',
+                        url: 'https://welcome.com',
+                        plugins: 'Tutor LMS, Learndash, Woocommerce',
+                        date: '20/08/2025',
+                        content: 'Hello there, I would like to show you something special',
+                        Platform: 'Fiverr',
+                        industry: 'Elearning',
+                        reviews: 'I am really happy working with DevsOffice',
+                        thumbnail: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8cHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=600&q=61'
+                    },
+                    {
+                        title: 'Get it now',
+                        name: 'I love this',
+                        url: 'https://wechat.com',
+                        plugins: 'Tutor LMS, Woocommerce',
+                        date: '24/08/2025',
+                        content: 'Hello i love this project',
+                        Platform: 'Upwork',
+                        industry: 'Business',
+                        reviews: 'I love this',
+                        thumbnail: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8cHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=600&q=62'
+                    },
+                    {
+                        title: 'Project Alpha',
+                        name: 'Alpha Project',
+                        url: 'https://alpha.com',
+                        plugins: 'Tutor LMS',
+                        date: '25/08/2025',
+                        content: 'This is alpha project',
+                        Platform: 'Fiverr',
+                        industry: 'Elearning',
+                        reviews: 'Great work!',
+                        thumbnail: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8cHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=600&q=61'
+                    },
+                    {
+                        title: 'Project Beta',
+                        name: 'Beta Project',
+                        url: 'https://beta.com',
+                        plugins: 'Learndash, Woocommerce',
+                        date: '26/08/2025',
+                        content: 'This is beta project',
+                        Platform: 'Upwork',
+                        industry: 'Business',
+                        reviews: 'Excellent service',
+                        thumbnail: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8cHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=600&q=61'
+                    },
+                    {
+                        title: 'Project Gamma',
+                        name: 'Gamma Project',
+                        url: 'https://gamma.com',
+                        plugins: 'Tutor LMS, Learndash, Woocommerce',
+                        date: '27/08/2025',
+                        content: 'This is gamma project',
+                        Platform: 'Fiverr',
+                        industry: 'Membership',
+                        reviews: 'Very satisfied',
+                        thumbnail: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8cHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=600&q=61'
+                    },
+                    {
+                        title: 'Project Delta',
+                        name: 'Delta Project',
+                        url: 'https://delta.com',
+                        plugins: 'Woocommerce',
+                        date: '28/08/2025',
+                        content: 'This is delta project',
+                        Platform: 'Upwork',
+                        industry: 'Elearning',
+                        reviews: 'Will work again',
+                        thumbnail: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8cHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=600&q=61'
+                    },
+                    {
+                        title: 'Project Epsilon',
+                        name: 'Epsilon Project',
+                        url: 'https://epsilon.com',
+                        plugins: 'Tutor LMS',
+                        date: '29/08/2025',
+                        content: 'This is epsilon project',
+                        Platform: 'Fiverr',
+                        industry: 'Business',
+                        reviews: 'Top quality work',
+                        thumbnail: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8cHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=600&q=61'
+                    }
+                ];
+                
+                csvData = sampleData;
+                processData(csvData);
+            }
+
+            // Populate filter dropdowns with unique values
+            function populateFilterOptions() {
+                const platformFilter = document.getElementById('platformFilter');
+                const industryFilter = document.getElementById('industryFilter');
+                const pluginFilter = document.getElementById('pluginFilter');
+                
+                // Clear existing options
+                platformFilter.innerHTML = '';
+                industryFilter.innerHTML = '';
+                pluginFilter.innerHTML = '';
+                
+                // Add platforms
+                uniqueValues.platforms.forEach(platform => {
+                    const option = document.createElement('option');
+                    option.value = platform;
+                    option.textContent = platform;
+                    platformFilter.appendChild(option);
+                });
+                
+                // Add industries
+                uniqueValues.industries.forEach(industry => {
+                    const option = document.createElement('option');
+                    option.value = industry;
+                    option.textContent = industry;
+                    industryFilter.appendChild(option);
+                });
+                
+                // Add plugins
+                uniqueValues.plugins.forEach(plugin => {
+                    const option = document.createElement('option');
+                    option.value = plugin;
+                    option.textContent = plugin;
+                    pluginFilter.appendChild(option);
+                });
+                
+                // Refresh bootstrap-select
+                $('.selectpicker').selectpicker('refresh');
+            }
+
+            // Apply filters to the data
+            function applyFilter() {
+                const platformValues = $('#platformFilter').val() || [];
+                const industryValues = $('#industryFilter').val() || [];
+                const pluginValues = $('#pluginFilter').val() || [];
+                const searchValue = document.getElementById('searchFilter').value.toLowerCase();
+                const itemLimit = parseInt(document.getElementById('itemLimit').value) || 10;
+                
+                filteredData = csvData.filter(row => {
+                    // Platform filter
+                    const platformMatch = platformValues.length === 0 || platformValues.includes(row.Platform);
+                    
+                    // Industry filter
+                    const industryMatch = industryValues.length === 0 || industryValues.includes(row.industry);
+                    
+                    // Plugin filter
+                    let pluginMatch = false;
+                    if (pluginValues.length === 0) {
+                        pluginMatch = true;
+                    } else if (row.plugins) {
+                        const rowPlugins = row.plugins.split(', ');
+                        pluginMatch = pluginValues.some(plugin => rowPlugins.includes(plugin));
+                    }
+                    
+                    // Search filter
+                    const searchMatch = searchValue === '' || 
+                        Object.values(row).some(value => 
+                            value && value.toString().toLowerCase().includes(searchValue)
+                        );
+                    
+                    return platformMatch && industryMatch && pluginMatch && searchMatch;
+                });
+                
+                // Apply item limit
+                displayedData = filteredData.slice(0, itemLimit);
+                
+                displayData(displayedData);
+                updateActiveFilters(platformValues, industryValues, pluginValues, searchValue);
+                updateTotalCount();
+                updateSelectionInfo();
+            }
+
+            // Randomize the displayed data order
+            function randomizeDisplayedData() {
+                // Clear selection when randomizing
+                selectedItems.clear();
+                
+                // Shuffle the filtered data using Fisher-Yates algorithm
+                for (let i = filteredData.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [filteredData[i], filteredData[j]] = [filteredData[j], filteredData[i]];
+                }
+                
+                // Apply item limit after shuffling
+                const itemLimit = parseInt(document.getElementById('itemLimit').value) || 10;
+                displayedData = filteredData.slice(0, itemLimit);
+                
+                displayData(displayedData);
+                updateTotalCount();
+                updateSelectionInfo();
+                
+                // Uncheck the select all checkbox
+                document.getElementById('selectAll').checked = false;
+            }
+
+            // Display filtered data in the table
+            function displayData(dataToDisplay) {
+                const tableBody = document.getElementById('dataTable');
+                
+                if (dataToDisplay.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="11" class="text-center py-4">No matching records found</td></tr>';
+                    return;
+                }
+                
+                let html = '';
+                dataToDisplay.forEach((row, index) => {
+                    const isSelected = selectedItems.has(row.url);
+                    html += `
+                        <tr>
+                            <td class="checkbox-cell">
+                                <div class="form-check">
+                                    <input class="form-check-input row-checkbox" type="checkbox" data-url="${row.url}" ${isSelected ? 'checked' : ''}>
+                                </div>
+                            </td>
+                            <td>${index + 1}</td>
+                            <td>${row.title || ''}</td>
+                            <td>${row.name || ''}</td>
+                            <td><a href="${row.url}" target="_blank">${row.url}</a></td>
+                            <td>${row.plugins || ''}</td>
+                            <td>${row.date || ''}</td>
+                            <td>${row.Platform || ''}</td>
+                            <td>${row.industry || ''}</td>
+                            <td>${row.reviews || ''}</td>
+                            <td class="thumbnail-cell">
+                                ${row.thumbnail ? `<img src="${row.thumbnail}" class="thumbnail" alt="Thumbnail">` : ''}
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                tableBody.innerHTML = html;
+                
+                // Add event listeners to checkboxes
+                document.querySelectorAll('.row-checkbox').forEach(checkbox => {
+                    checkbox.addEventListener('change', function() {
+                        const url = this.getAttribute('data-url');
+                        if (this.checked) {
+                            selectedItems.add(url);
+                        } else {
+                            selectedItems.delete(url);
+                        }
+                        updateSelectionInfo();
+                        
+                        // Update select all checkbox state
+                        updateSelectAllCheckbox();
+                    });
+                });
+            }
+
+            // Update active filters display
+            function updateActiveFilters(platforms, industries, plugins, search) {
+                const activeFiltersContainer = document.getElementById('activeFilters');
+                activeFiltersContainer.innerHTML = '';
+                
+                if (platforms.length > 0) {
+                    platforms.forEach(platform => {
+                        activeFiltersContainer.innerHTML += `
+                            <span class="badge bg-primary filter-pill">
+                                Platform: ${platform} <span class="ms-1 remove-filter" data-type="platform" data-value="${platform}">×</span>
+                            </span>
+                        `;
+                    });
+                }
+                
+                if (industries.length > 0) {
+                    industries.forEach(industry => {
+                        activeFiltersContainer.innerHTML += `
+                            <span class="badge bg-info text-dark filter-pill">
+                                Industry: ${industry} <span class="ms-1 remove-filter" data-type="industry" data-value="${industry}">×</span>
+                            </span>
+                        `;
+                    });
+                }
+                
+                if (plugins.length > 0) {
+                    plugins.forEach(plugin => {
+                        activeFiltersContainer.innerHTML += `
+                            <span class="badge bg-warning text-dark filter-pill">
+                                Plugin: ${plugin} <span class="ms-1 remove-filter" data-type="plugin" data-value="${plugin}">×</span>
+                            </span>
+                        `;
+                    });
+                }
+                
+                if (search) {
+                    activeFiltersContainer.innerHTML += `
+                        <span class="badge bg-success filter-pill">
+                            Search: "${search}" <span class="ms-1 remove-filter" data-type="search">×</span>
+                        </span>
+                    `;
+                }
+                
+                // Add event listeners to remove filter buttons
+                document.querySelectorAll('.remove-filter').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const filterType = this.getAttribute('data-type');
+                        const filterValue = this.getAttribute('data-value');
+                        
+                        if (filterType === 'platform') {
+                            $('#platformFilter').selectpicker('deselect', filterValue);
+                        } else if (filterType === 'industry') {
+                            $('#industryFilter').selectpicker('deselect', filterValue);
+                        } else if (filterType === 'plugin') {
+                            $('#pluginFilter').selectpicker('deselect', filterValue);
+                        } else if (filterType === 'search') {
+                            document.getElementById('searchFilter').value = '';
+                        }
+                        
+                        applyFilter();
+                    });
+                });
+            }
+
+            // Update total count display
+            function updateTotalCount() {
+                const totalCount = document.getElementById('totalCount');
+                const itemLimit = parseInt(document.getElementById('itemLimit').value) || 10;
+                const displayCount = Math.min(filteredData.length, itemLimit);
+                
+                totalCount.textContent = `${displayCount} of ${filteredData.length} ${filteredData.length === 1 ? 'item' : 'items'}`;
+                
+                if (filteredData.length > itemLimit) {
+                    totalCount.textContent += ` (limited to ${itemLimit})`;
+                }
+            }
+
+            // Update selection info display
+            function updateSelectionInfo() {
+                const selectionInfo = document.getElementById('selectionInfo');
+                if (selectedItems.size === 0) {
+                    selectionInfo.textContent = 'No items selected. Use checkboxes to select items for copying.';
+                } else {
+                    selectionInfo.textContent = `${selectedItems.size} ${selectedItems.size === 1 ? 'item' : 'items'} selected for copying.`;
+                }
+            }
+
+            // Update select all checkbox state
+            function updateSelectAllCheckbox() {
+                const selectAllCheckbox = document.getElementById('selectAll');
+                const allCheckboxes = document.querySelectorAll('.row-checkbox');
+                
+                if (allCheckboxes.length === 0) {
+                    selectAllCheckbox.checked = false;
+                    selectAllCheckbox.indeterminate = false;
+                    return;
+                }
+                
+                const checkedCount = document.querySelectorAll('.row-checkbox:checked').length;
+                
+                if (checkedCount === 0) {
+                    selectAllCheckbox.checked = false;
+                    selectAllCheckbox.indeterminate = false;
+                } else if (checkedCount === allCheckboxes.length) {
+                    selectAllCheckbox.checked = true;
+                    selectAllCheckbox.indeterminate = false;
+                } else {
+                    selectAllCheckbox.checked = false;
+                    selectAllCheckbox.indeterminate = true;
+                }
+            }
+
+            // Copy selected links to clipboard with numbering
+            function copySelectedLinksToClipboard() {
+                if (selectedItems.size === 0) {
+                    alert('No items selected! Please select items using the checkboxes.');
+                    return;
+                }
+                
+                // Create numbered list of selected URLs
+                const links = Array.from(selectedItems).map((url, index) => {
+                    return `${index + 1}. ${url}`;
+                }).join('\n');
+                
+                navigator.clipboard.writeText(links).then(() => {
+                    // Show success feedback
+                    const copyButton = document.getElementById('copyLinks');
+                    const originalText = copyButton.innerHTML;
+                    copyButton.innerHTML = '<i class="fas fa-check me-1"></i>Copied!';
+                    copyButton.classList.add('highlight');
+                    
+                    setTimeout(() => {
+                        copyButton.innerHTML = originalText;
+                        copyButton.classList.remove('highlight');
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Failed to copy links: ', err);
+                    alert('Failed to copy links to clipboard.');
+                });
+            }
+
+            // Select or deselect all displayed items
+            function toggleSelectAll(selectAll) {
+                const checkboxes = document.querySelectorAll('.row-checkbox');
+                
+                checkboxes.forEach(checkbox => {
+                    const url = checkbox.getAttribute('data-url');
+                    checkbox.checked = selectAll;
+                    
+                    if (selectAll) {
+                        selectedItems.add(url);
+                    } else {
+                        selectedItems.delete(url);
+                    }
+                });
+                
+                updateSelectionInfo();
+            }
+
+            // Event listeners
+            document.getElementById('applyFilters').addEventListener('click', applyFilter);
+            document.getElementById('refreshItems').addEventListener('click', randomizeDisplayedData);
+            document.getElementById('resetFilters').addEventListener('click', function() {
+                $('#platformFilter').selectpicker('deselectAll');
+                $('#industryFilter').selectpicker('deselectAll');
+                $('#pluginFilter').selectpicker('deselectAll');
+                document.getElementById('searchFilter').value = '';
+                document.getElementById('itemLimit').value = '10';
+                selectedItems.clear();
+                applyFilter();
+            });
+            document.getElementById('copyLinks').addEventListener('click', copySelectedLinksToClipboard);
+            
+            // Select all checkbox event listener
+            document.getElementById('selectAll').addEventListener('change', function() {
+                toggleSelectAll(this.checked);
+            });
+            
+            // Allow pressing Enter in search field to apply filters
+            document.getElementById('searchFilter').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    applyFilter();
+                }
+            });
+            
+            // Update results when item limit changes
+            document.getElementById('itemLimit').addEventListener('change', applyFilter);
+            document.getElementById('itemLimit').addEventListener('input', function() {
+                if (this.value < 1) this.value = 1;
+            });
+
+            // Initialize
+            fetchData();
+        });
+    </script>
+</body>
+</html>
