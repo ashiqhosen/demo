@@ -717,15 +717,15 @@
                                     <input class="form-check-input row-checkbox" type="checkbox" data-url="${row.url}" ${isSelected ? 'checked' : ''}>
                                 </div>
                             </td>
-                            <td>${index + 1}</td>
-                            <td>${row.title || ''}</td>
-                            <td>${row.name || ''}</td>
-                            <td><a href="${row.url}" target="_blank">${row.url}</a></td>
-                            <td>${row.plugins || ''}</td>
-                            <td>${row.date || ''}</td>
-                            <td>${row.Platform || ''}</td>
-                            <td>${row.industry || ''}</td>
-                            <td>${row.reviews || ''}</td>
+                            <td class="id">${index + 1}</td>
+                            <td class="title">${row.title || ''}</td>
+                            <td class="name">${row.name || ''}</td>
+                            <td class="url"><a href="${row.url}" target="_blank">${row.url}</a></td>
+                            <td class="plugins">${row.plugins || ''}</td>
+                            <td class="date">${row.date || ''}</td>
+                            <td class="platform">${row.Platform || ''}</td>
+                            <td class="industry">${row.industry || ''}</td>
+                            <td class="reviews">${row.reviews || ''}</td>
                             <td class="thumbnail-cell">
                                 ${row.thumbnail ? `<img src="${row.thumbnail}" class="thumbnail" alt="Thumbnail">` : ''}
                             </td>
@@ -949,5 +949,6 @@
     </script>
 </body>
 </html>
+
 
 
